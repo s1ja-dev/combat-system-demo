@@ -182,6 +182,8 @@ local function onRequestAttack(attacker: Player)
 		Damage = damage,
 		WasHeadshot = headshot,
 		TargetDied = target.Humanoid.Health <= 0,
+		HitPosition = target.Head.Position,
+		Weapon = "Melee",
 	})
 end
 

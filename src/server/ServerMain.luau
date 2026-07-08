@@ -10,6 +10,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local HealthService = require(script.Parent.Services.HealthService)
 local DummyService = require(script.Parent.Services.DummyService)
 local CombatService = require(script.Parent.Services.CombatService)
+local WeaponService = require(script.Parent.Services.WeaponService)
 
 local ServerMain = {}
 
@@ -21,6 +22,7 @@ function ServerMain.Start()
 	HealthService.Init()
 	DummyService.Init()
 	CombatService.Init()
+	WeaponService.Init()
 end
 
 return ServerMain

@@ -12,6 +12,8 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CombatConfig = require(ReplicatedStorage.Shared.Config.CombatConfig)
 
+local RagdollService = require(script.Parent.RagdollService)
+
 local DummyService = {}
 
 local invulnerableUntil: { [Model]: number } = {}
@@ -43,6 +45,14 @@ local function setupDummy(model: Instance)
 	humanoid.BreakJointsOnDeath = false
 
 	humanoid.Died:Connect(function()
+		-- Snapshot a pristine clone BEFORE ragdolling — RagdollService mutates
+		-- `model` in place (disables Motor6Ds, adds constraints), and cloning
+		-- from an already-ragdolled corpse would carry that broken rig into
+		-- the respawn. Taking the clone first guarantees it's identical to
+		-- the dummy's original, working state.
+		local respawnTemplate = model:Clone()
+		RagdollService.Ragdoll(model)
+
 		task.delay(CombatConfig.RespawnTime, function()
 			local parent = model.Parent
 			local pivot = model:GetPivot()
@@ -50,10 +60,11 @@ local function setupDummy(model: Instance)
 
 			if not parent then
 				-- Someone removed it from Workspace entirely; don't respawn.
+				respawnTemplate:Destroy()
 				return
 			end
 
-			local fresh = model:Clone()
+			local fresh = respawnTemplate
 			fresh:SetAttribute("_DummySetupDone", nil)
 
 			-- Reset Health while still off-tree, before Roblox's Humanoid

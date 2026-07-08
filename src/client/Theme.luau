@@ -18,6 +18,22 @@ local Theme = {
 	TextDark = Color3.fromRGB(35, 35, 40),
 	TextLight = Color3.fromRGB(255, 255, 255),
 	TextMuted = Color3.fromRGB(175, 178, 190),
+
+	-- Three distinct built-in Roblox display fonts for combat callouts — no
+	-- asset upload needed. Kept visually distinct from each other (and from
+	-- GothamBold/GothamBlack body text) on purpose: a player should be able
+	-- to tell "regular hit" / "headshot" / "kill" apart by silhouette alone.
+	HitFont = Enum.Font.GothamBlack,
+	HeadshotFont = Enum.Font.Bangers,
+	KillFeedFont = Enum.Font.PermanentMarker,
+
+	-- Bright, saturated yellow for headshot damage numbers — deliberately
+	-- louder than Warning (used elsewhere for generic rewards/attention) so
+	-- a headshot reads as its own, more urgent event.
+	HeadshotYellow = Color3.fromRGB(255, 221, 0),
+	-- Slightly dimmed white for regular hit damage numbers — still reads as
+	-- "white" but sits back visually next to HeadshotYellow.
+	HitWhite = Color3.fromRGB(232, 232, 232),
 }
 
 -- Darkens a color for outlines, mirroring the "stroke = darker shade of

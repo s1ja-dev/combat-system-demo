@@ -5,6 +5,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local NetConstants = require(ReplicatedStorage.Shared.Net.NetConstants)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local IconAssets = require(ReplicatedStorage.Shared.Config.IconAssets)
 
 local ClientRoot = script.Parent.Parent
 local Theme = require(ClientRoot.Theme)
@@ -15,7 +16,11 @@ function HealthBar.Init(screenGui: ScreenGui)
 	local track = Instance.new("Frame")
 	track.Name = "HealthBarTrack"
 	track.AnchorPoint = Vector2.new(0.5, 1)
-	track.Position = UDim2.new(0.5, 0, 1, -24)
+	-- -110 (not -24) clears Roblox's default bottom-center hotbar, which
+	-- became visible once WeaponService started giving players an equippable
+	-- Blaster tool — a plain melee-only demo never showed a hotbar at all, so
+	-- this overlap was invisible until now.
+	track.Position = UDim2.new(0.5, 0, 1, -110)
 	track.Size = UDim2.fromOffset(280, 28)
 	track.BackgroundColor3 = Theme.ChipBackground
 	track.BorderSizePixel = 0
@@ -53,6 +58,21 @@ function HealthBar.Init(screenGui: ScreenGui)
 	label.TextScaled = true
 	label.ZIndex = 2
 	label.Parent = track
+
+	-- Only added if an icon has actually been uploaded (see IconAssets) — an
+	-- empty Image id would just render as a blank square, so this keeps the
+	-- plain text/color bar as the fallback.
+	if IconAssets.Health ~= "" then
+		local icon = Instance.new("ImageLabel")
+		icon.Name = "Icon"
+		icon.AnchorPoint = Vector2.new(0, 0.5)
+		icon.Position = UDim2.new(0, 6, 0.5, 0)
+		icon.Size = UDim2.fromOffset(20, 20)
+		icon.BackgroundTransparency = 1
+		icon.Image = IconAssets.Health
+		icon.ZIndex = 3
+		icon.Parent = track
+	end
 
 	local healthChanged = Remotes.GetEvent(NetConstants.HealthChanged)
 	healthChanged.OnClientEvent:Connect(function(data: { Health: number, MaxHealth: number })

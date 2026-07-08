@@ -12,6 +12,8 @@ local NetConstants = require(ReplicatedStorage.Shared.Net.NetConstants)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local CombatConfig = require(ReplicatedStorage.Shared.Config.CombatConfig)
 
+local RagdollService = require(script.Parent.RagdollService)
+
 local HealthService = {}
 
 local invulnerableUntil: { [Player]: number } = {}
@@ -20,6 +22,12 @@ local function setupCharacter(player: Player, character: Model)
 	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
 	humanoid.MaxHealth = CombatConfig.MaxHealth
 	humanoid.Health = CombatConfig.MaxHealth
+	-- Roblox's own built-in "break joints on death" would otherwise recreate
+	-- fresh, fully-enabled Motor6Ds right after RagdollService disables them
+	-- — confirmed live (BallSocketConstraints got created correctly but the
+	-- Motor6Ds came back Enabled moments later). Disabling it here hands
+	-- ragdoll duty entirely to RagdollService, with nothing competing.
+	humanoid.BreakJointsOnDeath = false
 
 	invulnerableUntil[player] = os.clock() + CombatConfig.InvulnerabilityDuration
 
@@ -31,6 +39,7 @@ local function setupCharacter(player: Player, character: Model)
 
 	humanoid.Died:Connect(function()
 		invulnerableUntil[player] = nil
+		RagdollService.Ragdoll(character)
 		task.delay(CombatConfig.RespawnTime, function()
 			if player.Parent then
 				player:LoadCharacter()

@@ -13,6 +13,8 @@ local REMOTE_NAMES = {
 	NetConstants.RequestAttack,
 	NetConstants.CombatHit,
 	NetConstants.HealthChanged,
+	NetConstants.RequestFire,
+	NetConstants.WeaponFired,
 }
 
 local Remotes = {}
